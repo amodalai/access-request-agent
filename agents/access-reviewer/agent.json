@@ -1,0 +1,6 @@
+{
+  "name": "Access Reviewer",
+  "description": "Checks one access request against the company's fictional access policy. Returns one check per category, an issues list, and a single recommendation (grant / limit / escalate / deny) as a JSON object, for a human system owner. Does NOT grant, deny, or provision anything itself.",
+  "tools": ["access_math", "load_knowledge"],
+  "timeout": 120
+}

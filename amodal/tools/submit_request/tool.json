@@ -1,0 +1,34 @@
+{
+  "description": "Submit an access request for review, as an employee. Validates the fields, writes the request row (a new one, or the returned one at revision + 1 when request_id is given), appends the submitted or resubmitted event, then reviews the request in the same run: the deterministic checks in code, the policy judgment in the access-reviewer subagent. Returns { request_id, revision, recommendation, review_id }. Fired only from the requester's New request form via the direct-invoke lane; not listed in any agent's tools.",
+  "parameters": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "request_id": { "type": "string", "description": "Present on a resubmission: the returned request to replace." },
+      "role_id": { "type": "string", "description": "A role from the catalog, e.g. netsuite.gl_read." },
+      "start_date": { "type": "string", "description": "YYYY-MM-DD" },
+      "end_date": { "type": "string", "description": "YYYY-MM-DD. Not capped: the policy's duration limit is checked by the review." },
+      "justification": { "type": "string", "description": "Why the role is needed, in the requester's words." },
+      "ticket": { "type": "string", "description": "An onboarding, incident, or change ticket, when there is one." },
+      "notes": { "type": "string" },
+      "requester": { "type": "string", "description": "The person asking, as Name (Team)." }
+    },
+    "required": ["role_id", "start_date", "end_date", "justification", "requester"]
+  },
+  "runningLabel": "Submitting and reviewing the request",
+  "completedLabel": "Submitted and reviewed the request",
+  "timeout": 180000,
+  "execution": "durable",
+  "uses": {
+    "tools": [
+      "store__requests__get",
+      "store__requests__query",
+      "store__requests__set",
+      "store__entitlements__query",
+      "store__reviews__set",
+      "store__events__set"
+    ],
+    "subagents": ["access-reviewer"]
+  },
+  "triggers": [{ "kind": "invoke" }]
+}

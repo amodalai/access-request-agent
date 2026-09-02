@@ -1,0 +1,33 @@
+{
+  "description": "Load the demo dataset into the stores: the existing entitlements, the six live access requests, and a decided backlog of ten requests with their reviews, events, and the entitlements they granted. Idempotent per row: rows that are already present are skipped, so it is safe to run again. Runs from the `seed` chat command and from the UI on first open, when the requests store is empty.",
+  "parameters": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  },
+  "runningLabel": "Loading the demo requests",
+  "completedLabel": "Loaded the demo requests",
+  "timeout": 60000,
+  "execution": "durable",
+  "uses": {
+    "tools": [
+      "store__entitlements__query",
+      "store__entitlements__set",
+      "store__requests__query",
+      "store__requests__set",
+      "store__reviews__query",
+      "store__reviews__set",
+      "store__events__query",
+      "store__events__set"
+    ]
+  },
+  "triggers": [
+    { "kind": "invoke" },
+    {
+      "kind": "regex",
+      "pattern": "^\\s*seed(?:\\s+examples)?\\s*$",
+      "flags": "i",
+      "continueToLLM": true
+    }
+  ]
+}

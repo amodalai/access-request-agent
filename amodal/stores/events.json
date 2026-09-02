@@ -1,0 +1,24 @@
+{
+  "name": "events",
+  "key": "{event_id}",
+  "schema": {
+    "event_id": { "type": "string" },
+    "request_id": { "type": "string", "nullable": true },
+    "kind": {
+      "type": "enum",
+      "values": ["seeded", "submitted", "resubmitted", "reviewed", "returned", "granted", "denied", "reset"]
+    },
+    "actor": { "type": "string" },
+    "recommendation": {
+      "type": "enum",
+      "values": ["grant", "limit", "escalate", "deny"],
+      "nullable": true
+    },
+    "note": { "type": "string", "nullable": true },
+    "revision": { "type": "number", "nullable": true },
+    "created_at": { "type": "datetime" }
+  },
+  "indexed": ["request_id", "kind", "actor", "created_at"],
+  "deletable": true,
+  "_comment_purpose": "One row per action on a request, appended by the tool that made it in the same run: submit_request (`submitted`, `resubmitted`, actor the requester), review_request (`reviewed`, actor `agent`, with the clamped `recommendation`), decide_request (`granted`, `denied`, `returned`, actor `approver`, with the operator's `note`), and the seed and reset (`seeded`, `reset`, actor `system`; `reset` has no request). `revision` is the request revision the event belongs to. The chat agent reads this store to answer history questions; the UI renders it as the History tab and the request timeline. Rows are never edited."
+}

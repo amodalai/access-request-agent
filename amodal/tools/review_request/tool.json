@@ -1,0 +1,41 @@
+{
+  "description": "Review one access request: load it (with the requester's entitlements and other requests) from the stores, run the deterministic checks in code (role lookup, segregation-of-duties conflicts, roles already held, duplicate open request, duration against the policy limit), delegate the policy judgment to the access-reviewer subagent, then save a new review row, stamp the request with its id and recommendation, and append a reviewed event. Returns the saved review. Recommends grant / limit / escalate / deny for a human system owner; never grants or provisions anything itself. Reports found: false when the request id is unknown. Runs from the `review <id>` chat command and from the UI's Review button through the direct-invoke lane.",
+  "parameters": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "request_id": {
+        "type": "string",
+        "description": "The request to review, e.g. req_tom_github_developer."
+      }
+    },
+    "required": ["request_id"]
+  },
+  "runningLabel": "Reviewing {{request_id}}",
+  "completedLabel": "Reviewed {{request_id}}",
+  "timeout": 180000,
+  "execution": "durable",
+  "uses": {
+    "tools": [
+      "store__requests__get",
+      "store__requests__query",
+      "store__requests__set",
+      "store__entitlements__query",
+      "store__entitlements__set",
+      "store__reviews__query",
+      "store__reviews__set",
+      "store__events__query",
+      "store__events__set"
+    ],
+    "subagents": ["access-reviewer"]
+  },
+  "triggers": [
+    { "kind": "invoke" },
+    {
+      "kind": "regex",
+      "pattern": "^\\s*(?:review|check|audit)\\s+(?<request_id>req_[a-z0-9_]+)\\s*$",
+      "flags": "i",
+      "continueToLLM": true
+    }
+  ]
+}

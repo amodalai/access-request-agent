@@ -1,0 +1,39 @@
+{
+  "name": "requests",
+  "key": "{request_id}",
+  "schema": {
+    "request_id": { "type": "string" },
+    "requester": { "type": "string" },
+    "manager": { "type": "string" },
+    "role_id": { "type": "string" },
+    "system": { "type": "string" },
+    "role": { "type": "string" },
+    "sensitivity": { "type": "enum", "values": ["standard", "privileged"] },
+    "justification": { "type": "string" },
+    "ticket": { "type": "string", "nullable": true },
+    "start_date": { "type": "string" },
+    "end_date": { "type": "string" },
+    "notes": { "type": "string", "nullable": true },
+    "revision": { "type": "number" },
+    "status": {
+      "type": "enum",
+      "values": ["new", "reviewed", "granted", "denied", "returned"]
+    },
+    "recommendation": {
+      "type": "enum",
+      "values": ["grant", "limit", "escalate", "deny"],
+      "nullable": true
+    },
+    "review_id": { "type": "string", "nullable": true },
+    "reviewed_at": { "type": "datetime", "nullable": true },
+    "decided_at": { "type": "datetime", "nullable": true },
+    "decision_note": { "type": "string", "nullable": true },
+    "returned_note": { "type": "string", "nullable": true },
+    "received_at": { "type": "datetime" },
+    "submitted_at": { "type": "datetime" },
+    "created_at": { "type": "datetime" }
+  },
+  "indexed": ["requester", "role_id", "system", "status", "recommendation", "received_at", "created_at"],
+  "deletable": true,
+  "_comment_purpose": "An access request waiting for a system owner's decision, submitted by an employee (`requester`, as `Name (Team)`) or seeded. `role_id` names a role in amodal/_lib/catalog.ts; `system`, `role`, `sensitivity`, and `manager` are copied onto the row at submit so a reader needs no catalog. review_request reads the row plus the requester's entitlements and other requests, checks it against the access policy, and writes the clamped `recommendation` and the `review_id` of the review for the current `revision`. `status` is the human-owned lane (new -> reviewed -> granted | denied; reviewed -> returned -> new on resubmit, revision + 1): the reviewer only advances it to `reviewed`; `granted`, `denied`, and `returned` (with `returned_note`) are written by decide_request from the approver's click. `received_at` is when the request first arrived; `submitted_at` is when the current revision was submitted. No provisioning fields by design: the example recommends a decision, it never touches a real system."
+}

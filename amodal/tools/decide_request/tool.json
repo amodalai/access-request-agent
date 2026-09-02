@@ -1,0 +1,39 @@
+{
+  "description": "Record the system owner's decision on a reviewed access request: granted, denied, or returned to the requester with a note. Granting re-runs the hard rules in code (unknown role, segregation-of-duties conflict, role already held, duplicate open request, duration over the limit) and refuses when any fails, needs a note when the review recommended escalate, and writes the entitlement with the request's end date as its expiry. Returning needs a note and puts the request back to the requester for a resubmission. Every decision appends an event. Fired only from the operator-confirmed Grant / Return / Deny action via the direct-invoke lane; not listed in any agent's tools, so the model cannot call it.",
+  "parameters": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "request_id": {
+        "type": "string",
+        "description": "The request to decide, e.g. req_tom_github_developer."
+      },
+      "decision": {
+        "type": "string",
+        "enum": ["granted", "denied", "returned"],
+        "description": "The system owner's decision."
+      },
+      "note": {
+        "type": "string",
+        "description": "The system owner's note, recorded with the decision. Required for returned, and for granted when the review recommended escalate."
+      }
+    },
+    "required": ["request_id", "decision"]
+  },
+  "runningLabel": "Recording the decision on {{request_id}}",
+  "completedLabel": "Recorded the decision on {{request_id}}",
+  "timeout": 30000,
+  "execution": "durable",
+  "uses": {
+    "tools": [
+      "store__requests__get",
+      "store__requests__query",
+      "store__requests__set",
+      "store__reviews__get",
+      "store__entitlements__query",
+      "store__entitlements__set",
+      "store__events__set"
+    ]
+  },
+  "triggers": [{ "kind": "invoke" }]
+}

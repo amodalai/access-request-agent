@@ -1,0 +1,11 @@
+{
+  "name": "Access Request Chat",
+  "description": "The chat front door for the access request demo. Reports review results and answers questions from the stores; the deterministic work runs in triggered tools, and decisions come only from the system owner's Grant / Return / Deny action.",
+  "tools": ["review_request", "seed_examples", "access_math"],
+  "stores": {
+    "requests": "rw",
+    "entitlements": "rw",
+    "reviews": "rw",
+    "events": "rw"
+  }
+}

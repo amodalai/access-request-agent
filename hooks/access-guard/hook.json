@@ -1,0 +1,19 @@
+{
+  "name": "access-guard",
+  "label": "Access guard",
+  "description": "Enforces the access policy's hard rules at the platform layer, for EVERY writer: a role that conflicts with one the person already holds (segregation of duties) can never be granted, and no role can be granted for longer than its limit (30 days privileged, 365 days standard). The decide_request tool and the review_request tool already enforce this in code, but the chat agent has rw store tools and a future tool could regress. This preToolUse hook fires on any store__requests__set carrying status: granted or recommendation: grant, on any store__reviews__set carrying recommendation: grant, and on any store__entitlements__set carrying status: active, reads the person's other entitlements, and blocks the write when a rule fails. The pairs and the privileged roles mirror amodal/_lib/catalog.ts; the limits mirror amodal/_lib/policy.ts and amodal/knowledge/access-policy.md. Capability gate (store:read) + verified caller are platform-supplied, while the policy (the rule) is the author's, owned here.",
+  "points": ["preToolUse"],
+  "capabilities": ["store:read", "reads_tool_io", "gates_tools"],
+  "failPolicy": "closed",
+  "config": {
+    "guardedTools": ["store__requests__set", "store__reviews__set", "store__entitlements__set"],
+    "privilegedMaxDays": 30,
+    "standardMaxDays": 365,
+    "privilegedRoles": ["aws.prod_admin", "github.org_owner", "okta.admin", "snowflake.account_admin"],
+    "sodPairs": [
+      ["salesforce.deal_desk", "salesforce.commission_admin"],
+      ["netsuite.ap_clerk", "netsuite.ap_approver"],
+      ["aws.prod_deploy", "aws.change_approver"]
+    ]
+  }
+}

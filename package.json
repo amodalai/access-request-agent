@@ -1,0 +1,34 @@
+{
+  "name": "@amodalai/example-access-request",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An Amodal example that reviews IT access requests against a segregation-of-duties matrix, the requester's existing entitlements, and an access policy: an employee requests a role from a custom React UI, a durable tool runs the deterministic checks in code and delegates the judgment to a reviewer subagent, a system owner grants, returns, or denies, four stores keep the requests, entitlements, reviews, and events, and a preToolUse guard hook enforces the hard rules platform-wide.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.app.json",
+    "test": "tsx --test tests/*.test.ts && node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@amodalai/react": "0.3.124",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.5.0",
+    "vite": "^7.0.0"
+  },
+  "amodal": {
+    "type": "template",
+    "name": "access-request-example",
+    "displayName": "Access Request Example",
+    "description": "Review IT access requests against a segregation-of-duties matrix, existing entitlements, and a fictional access policy. An employee requests a role, the access-reviewer subagent checks it and recommends grant, limit, escalate, or deny, and a system owner decides or returns it for a fix. The agent assists; a human decides.",
+    "category": "IT & Security"
+  }
+}

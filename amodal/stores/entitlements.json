@@ -1,0 +1,20 @@
+{
+  "name": "entitlements",
+  "key": "{entitlement_id}",
+  "schema": {
+    "entitlement_id": { "type": "string" },
+    "person": { "type": "string" },
+    "role_id": { "type": "string" },
+    "system": { "type": "string" },
+    "role": { "type": "string" },
+    "sensitivity": { "type": "enum", "values": ["standard", "privileged"] },
+    "granted_at": { "type": "datetime" },
+    "expires_at": { "type": "datetime" },
+    "source_request_id": { "type": "string", "nullable": true },
+    "status": { "type": "enum", "values": ["active", "expired"] },
+    "created_at": { "type": "datetime" }
+  },
+  "indexed": ["person", "role_id", "system", "status"],
+  "deletable": true,
+  "_comment_purpose": "A role a person holds: what was granted, when it expires, and the request that granted it (`source_request_id`, null for access that predates the demo). Keyed ent_{person}_{role_id}, one row per person and role, so a re-grant replaces the expired row. review_request reads a requester's rows to find segregation-of-duties conflicts and roles already held; decide_request writes a row on a grant with `expires_at` equal to the request's end date. The Systems tab lists each role's holders from this store."
+}
