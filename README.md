@@ -1,5 +1,7 @@
 # Access Request Example
 
+![The system owner's queue: six requests, each with the agent's recommendation and the issues behind it](docs/screenshot.png)
+
 An Amodal agent that reviews IT access requests before a system owner
 decides, in a two-persona access-governance demo for a fictional company,
 Halden Systems. An employee requests a role; the agent checks the
@@ -158,6 +160,7 @@ hook makes it true for every writer, including the chat agent's store tools.
 | `evals/`                                    | The eval suite: one per live request, a seed smoke test, a history question, and two safety evals. Re-run it before promoting. |
 | `src/`                                      | The custom React UI (Vite): `App.tsx` (rail, persona, hash routes, auto-seed), `routes.ts`, `persona.ts`, `types.ts`, `screens/` (Queue, RequestDetail, Systems, History, Policy, Submit, MyRequests), and `components/`. |
 | `tests/`                                    | Unit tests for the code paths (`npm test`). Kept out of `amodal/` and `hooks/` so the runtime's loaders never see them. |
+| `docs/screenshot.png`                       | The screenshot at the top of this README, and the source for the marketplace card image. |
 
 ## Example cases
 
