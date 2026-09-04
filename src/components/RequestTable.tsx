@@ -6,7 +6,7 @@ import { SensitivityPill, StatusPill } from "./StatusPill.js";
 
 function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: RequestActions }) {
   const review = latestReview(data, req);
-  const durationNote = review?.checks?.find((c) => c.name === "duration")?.note?.trim();
+  const flagged = review?.checks?.filter((c) => c.status !== "pass") ?? [];
   return (
     <tr>
       <td>
@@ -37,7 +37,17 @@ function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: Req
       </td>
       <td>
         <StatusPill req={req} />
-        {durationNote ? <div className="note">{durationNote}</div> : null}
+        {flagged.length ? (
+          <div className="checks">
+            {flagged.map((c) => (
+              <span key={c.name} className={`pill check-${c.status}`} title={c.note}>
+                {c.name} {c.status === "fail" ? "failed" : "flagged"}
+              </span>
+            ))}
+          </div>
+        ) : review?.checks?.length ? (
+          <div className="note">All {review.checks.length} checks pass</div>
+        ) : null}
       </td>
       <td className="issues">
         {review?.issues?.length ? (

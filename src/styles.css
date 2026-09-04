@@ -559,6 +559,14 @@ td.num {
   overflow: hidden;
 }
 
+/* The checks that drove a recommendation, under its pill. */
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 7px;
+}
+
 .issues {
   color: var(--ink-2);
   font-size: 12.5px;
