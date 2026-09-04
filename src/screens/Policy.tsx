@@ -15,26 +15,18 @@ export function Policy() {
           <p className="sub">The limits and pairs the code enforces, then the policy text the reviewer subagent reads.</p>
         </div>
       </div>
-      <table className="grid grid--compact">
-        <tbody>
-          <tr>
-            <td>Privileged role, per grant</td>
-            <td className="num">{POLICY.privileged_max_days} days</td>
-          </tr>
-          <tr>
-            <td>Standard role, per grant</td>
-            <td className="num">{POLICY.standard_max_days} days</td>
-          </tr>
-          <tr>
-            <td>Privileged roles</td>
-            <td className="num">{PRIVILEGED_ROLE_IDS.map(label).join(", ")}</td>
-          </tr>
-          <tr>
-            <td>Segregation of duties</td>
-            <td className="num">{SOD_PAIRS.map(([a, b]) => `${label(a)} / ${label(b)}`).join("; ")}</td>
-          </tr>
-        </tbody>
-      </table>
+      <section className="card">
+        <dl className="fields">
+          <dt>Privileged role, per grant</dt>
+          <dd>{POLICY.privileged_max_days} days</dd>
+          <dt>Standard role, per grant</dt>
+          <dd>{POLICY.standard_max_days} days</dd>
+          <dt>Privileged roles</dt>
+          <dd>{PRIVILEGED_ROLE_IDS.map(label).join(", ")}</dd>
+          <dt>Segregation of duties</dt>
+          <dd>{SOD_PAIRS.map(([a, b]) => `${label(a)} / ${label(b)}`).join("; ")}</dd>
+        </dl>
+      </section>
       <p className="sub">
         The <code>access-guard</code> hook enforces the hard rules for every writer, the chat agent included. The values
         live in <code>amodal/_lib/catalog.ts</code>, <code>amodal/_lib/policy.ts</code>, <code>hooks/access-guard/hook.json</code>, and{" "}
