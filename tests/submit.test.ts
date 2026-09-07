@@ -139,9 +139,11 @@ test("a resubmission is refused unless the request is returned", async () => {
   await assert.rejects(submitRequest({ ...form, request_id: "req_priya_netsuite_ap_approver" }, deps), /is new; only a returned request/);
 });
 
-test("a failing review leaves the request new, with its submitted event, and rethrows", async () => {
+test("a failing review returns the saved request so retrying does not create a duplicate", async () => {
   const { deps, store, events } = fakeDeps("THROW");
-  await assert.rejects(submitRequest(form, deps), /reviewer down/);
+  assert.deepEqual(await submitRequest(form, deps), {
+    request_id: "req_priya_nair_finance_netsuite_gl_read", revision: 1, review_error: "reviewer down",
+  });
   const row = store.get("requests:req_priya_nair_finance_netsuite_gl_read")!;
   assert.equal(row.status, "new");
   assert.equal(row.review_id, null);

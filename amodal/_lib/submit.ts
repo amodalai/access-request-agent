@@ -66,7 +66,7 @@ export function validateSubmission(input: unknown): SubmitParams {
  * Write the request (a new row, or the returned one at revision + 1), append
  * the event, then review the row held in memory: a run cannot read back its
  * own writes. A review failure leaves the request `new` for the approver's
- * Review button to retry.
+ * Review button to retry; the result retains the saved request id.
  */
 export async function submitRequest(input: unknown, deps: ReviewDeps) {
   const { request_id: id, ...fields } = validateSubmission(input);
@@ -96,9 +96,13 @@ export async function submitRequest(input: unknown, deps: ReviewDeps) {
   await deps.callTool("store__requests__set", { key: request.request_id, value: request });
   await appendEvent(deps, { request_id: request.request_id, kind: id ? "resubmitted" : "submitted", actor: fields.requester, revision });
 
-  const held = rows<EntitlementRow>(
-    await deps.callTool("store__entitlements__query", { where: { person: fields.requester }, limit: 200 }),
-  );
-  const out = await runRequestReview(request.request_id, deps, { request, held, others });
-  return { request_id: request.request_id, revision, recommendation: out.recommendation, review_id: out.review_id };
+  try {
+    const held = rows<EntitlementRow>(
+      await deps.callTool("store__entitlements__query", { where: { person: fields.requester }, limit: 200 }),
+    );
+    const out = await runRequestReview(request.request_id, deps, { request, held, others });
+    return { request_id: request.request_id, revision, recommendation: out.recommendation, review_id: out.review_id };
+  } catch (error) {
+    return { request_id: request.request_id, revision, review_error: error instanceof Error ? error.message : String(error) };
+  }
 }
