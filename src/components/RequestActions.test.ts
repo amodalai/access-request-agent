@@ -11,6 +11,15 @@ test("reviewed requests offer re-review and human decisions", () => {
   assert.deepEqual(buttons.map(text), ["Re-review", "Grant", "Return", "Deny"]);
 });
 
+test("returned requests wait for the requester to resubmit", () => {
+  const ui = mount();
+  const { req } = reviewed(ui);
+  req.status = "returned";
+  const row = ui.rows()[0];
+  assert.deepEqual(walk(row, true).filter((el) => el.type === "button"), []);
+  assert.match(text(row), /Waiting for the requester/);
+});
+
 test("a re-review hides decisions and the earlier verdict until it finishes", async () => {
   const ui = mount();
   const { review } = reviewed(ui);

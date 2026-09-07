@@ -206,3 +206,16 @@ test("an unknown request reports found: false without writing", async () => {
   assert.deepEqual(await runRequestReview("req_nope", deps), { found: false, request_id: "req_nope" });
   assert.ok(!calls.some(([n]) => n.endsWith("__set")));
 });
+
+test("reviewing cannot reopen a human decision or skip a returned request's revision", async () => {
+  for (const status of ["granted", "denied", "returned"]) {
+    const { deps, store, calls, inputs } = fakeDeps(REPLY, NOW);
+    const key = "requests:req_tom_github_developer";
+    const request = { ...store.get(key)!, status, returned_note: "Please shorten the access period." };
+    store.set(key, request);
+    await assert.rejects(runRequestReview("req_tom_github_developer", deps), /only a new or reviewed request/);
+    assert.deepEqual(store.get(key), request);
+    assert.equal(inputs.length, 0);
+    assert.ok(!calls.some(([name]) => name.endsWith("__set")));
+  }
+});

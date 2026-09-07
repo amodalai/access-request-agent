@@ -10,6 +10,8 @@ export function RequestActionButtons({ req, actions }: { req: RequestRow; action
       {error ? <div className="row-error">{error}</div> : null}
       {isDecided(req) ? (
         req.decision_note ? <div className="note">{req.decision_note}</div> : null
+      ) : req.status === "returned" ? (
+        <div className="note">Waiting for the requester to edit and resubmit.</div>
       ) : (
         <div className="act-row">
           <button className="btn btn--review" disabled={busy} onClick={() => actions.onReview(req.request_id)}>

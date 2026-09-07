@@ -317,6 +317,9 @@ export async function runRequestReview(
   const loaded = preloaded ?? (await loadOrSeedExample(request_id, deps));
   if (!loaded) return { found: false, request_id };
   const { request, held, others } = loaded;
+  if (request.status !== "new" && request.status !== "reviewed") {
+    throw new Error(`Request ${request_id} is ${request.status}; only a new or reviewed request can be reviewed.`);
+  }
   const label = roleLabel(request);
 
   const facts = checkRequest(request, held, others);
