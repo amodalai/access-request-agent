@@ -16,7 +16,8 @@ Context: Self-seeding: on fresh stores the review_request tool loads the demo da
 
 ## Assertions
 
-- contains: grant
+- regex: /\bgrant\b/i
 - Should recommend grant, with every check passing
 - Should cite the access_math arithmetic in the duration check (364 days against the 365-day limit for standard roles)
+- Should assess the requested duration without treating the fictional example dates as overdue against today's date
 - Should NOT say the role was provisioned or granted by the agent

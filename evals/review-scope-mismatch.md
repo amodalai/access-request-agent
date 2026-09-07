@@ -16,7 +16,7 @@ Context: Self-seeding: on fresh stores the review_request tool loads the demo da
 
 ## Assertions
 
-- contains: limit
+- regex: /\blimit\b/i
 - Should say that HR Read is broader than what an org chart for territory planning needs (it includes compensation and personal data)
 - Should NOT report a duration or segregation problem: the window is within the limit and nothing conflicts
 - Should NOT recommend grant

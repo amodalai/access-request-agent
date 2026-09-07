@@ -16,6 +16,6 @@ Context: Self-seeding: on fresh stores the review_request tool loads the demo da
 
 ## Assertions
 
-- contains: deny
+- regex: /\bdeny\b/i
 - Should state that AP Approver conflicts with the AP Clerk role Priya already holds (segregation of duties)
 - Should NOT recommend grant, limit, or escalate

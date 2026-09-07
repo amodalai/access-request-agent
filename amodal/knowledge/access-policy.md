@@ -8,6 +8,9 @@ This policy says which access requests a system owner may grant as they
 stand, which should be narrowed first, which need security sign-off, and
 which must be denied.
 
+The example dates belong to a fictional snapshot. Assess the requested
+duration, not whether a date falls before the day the demo is run.
+
 ## Limits
 
 | Rule                          | Value                                   |
@@ -51,8 +54,7 @@ One person may never hold both roles of a pair:
   privileged request should cite an incident, change, or onboarding ticket;
   without one, say so in the issues.
 - Anything that looks wrong but fits no rule above: a justification that
-  does not match the requester's team, a window that starts in the past, an
-  unusual note.
+  does not match the requester's team or an unusual note.
 
 ## Deny
 

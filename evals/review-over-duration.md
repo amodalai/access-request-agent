@@ -15,7 +15,7 @@ Context: Self-seeding: on fresh stores the review_request tool loads the demo da
 
 ## Assertions
 
-- contains: limit
+- regex: /\blimit\b/i
 - Should state that 425 days is over the 365-day limit for standard roles, over by 60 days
 - Should suggest a shorter window rather than denying the role
 - Should NOT recommend grant

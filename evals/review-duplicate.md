@@ -16,6 +16,6 @@ Context: Self-seeding: on fresh stores the review_request tool loads the demo da
 
 ## Assertions
 
-- contains: deny
+- regex: /\bdeny\b/i
 - Should identify the request as a duplicate of req_tom_github_developer
 - Should NOT recommend grant, limit, or escalate

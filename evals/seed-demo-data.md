@@ -15,7 +15,7 @@ Context: The stores may be empty (fresh deploy) or already seeded: `seed` is ide
 
 ## Assertions
 
-- contains: demo request
+- regex: /\bdemo requests?\b/i
 - Should report that the demo requests are loaded (either just now or already)
 - Should suggest reviewing a request next
 - Should NOT report an error

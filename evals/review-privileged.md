@@ -17,7 +17,7 @@ Context: Self-seeding: on fresh stores the review_request tool loads the demo da
 
 ## Assertions
 
-- contains: escalate
+- regex: /\bescalate\b/i
 - Should state that Prod Admin is a privileged role that needs security sign-off
 - Should note that the 14-day window is within the 30-day limit for privileged roles, with the numbers
 - Should mention the incident ticket INC-2291
