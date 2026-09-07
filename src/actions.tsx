@@ -14,6 +14,7 @@ export function useRequestActions(data: Data) {
   const review = useToolRun<{ request_id: string }>("review_request");
   const decide = useToolRun<{ request_id: string; decision: Decision; note?: string }>("decide_request");
   const [reviewing, setReviewing] = useState<Set<string>>(new Set());
+  const [activeReview, setActiveReview] = useState<string | null>(null);
   const [errors, setErrors] = useState<Map<string, string>>(new Map());
   const [target, setTarget] = useState<{ req: RequestRow; decision: Decision } | null>(null);
   const [deciding, setDeciding] = useState(false);
@@ -31,12 +32,14 @@ export function useRequestActions(data: Data) {
   }
 
   async function runReview(request_id: string) {
+    setActiveReview(request_id);
     try {
       await runTool(review, { request_id });
       await data.refetch();
     } catch (err) {
       setErrors((m) => new Map(m).set(request_id, errorMessage(err, "Review failed.")));
     } finally {
+      setActiveReview(null);
       setReviewing((s) => {
         const next = new Set(s);
         next.delete(request_id);
@@ -76,7 +79,7 @@ export function useRequestActions(data: Data) {
     />
   ) : null;
 
-  return { reviewing, errors, onReview, onDecide, modal };
+  return { reviewing, activeReview, errors, onReview, onDecide, modal };
 }
 
 export type RequestActions = ReturnType<typeof useRequestActions>;

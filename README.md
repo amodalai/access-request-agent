@@ -1,6 +1,6 @@
 # Access Request Example
 
-![The system owner's queue: six requests, each with the agent's recommendation and the issues behind it](docs/screenshot.png)
+![Local preview of the system owner's queue with six seeded employee requests awaiting review](docs/screenshot.png)
 
 An Amodal agent that reviews IT access requests before a system owner
 decides, in a two-persona access-governance demo for a fictional company,
@@ -202,9 +202,10 @@ variables are needed.
    ("Loading the demo…"), then shows the system owner's **Queue** with the
    six live requests.
 2. Click **Review** on a row, or **Review all**. The recommendation, the
-   duration note (the `access_math` numbers, cited by the reviewer), and the
-   issues appear inline. Click a requester to open the request: what they
-   already hold, the checks, the review, and the timeline.
+   issues or review summary, and the flagged checks appear together. The
+   header distinguishes the active review from queued requests. Decision
+   buttons stay hidden while a request awaits or runs its review. Click a
+   requester to see their existing access, the full review, and the timeline.
 3. **Grant** Tom's GitHub Developer request and confirm. Tom appears as a
    holder on the **Systems** tab. Review `req_tom_github_developer_again`:
    it is a duplicate of a request that is now decided, so the duplicate

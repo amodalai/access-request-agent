@@ -350,6 +350,10 @@ section h2 {
   max-width: 70ch;
 }
 
+.sub.queue-guide {
+  margin-bottom: 16px;
+}
+
 .screen__bar > .btn,
 .screen__bar > .filter,
 .screen__bar > .pill {
@@ -567,11 +571,19 @@ td.num {
   margin-top: 7px;
 }
 
-.issues {
+.verdict {
+  min-width: 26ch;
+  max-width: 46ch;
+}
+
+.reason {
   color: var(--ink-2);
-  font-size: 12.5px;
-  min-width: 22ch;
-  max-width: 34ch;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.verdict .reason {
+  margin-top: 6px;
 }
 
 .issue-list {

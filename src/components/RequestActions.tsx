@@ -13,9 +13,9 @@ export function RequestActionButtons({ req, actions }: { req: RequestRow; action
       ) : (
         <div className="act-row">
           <button className="btn btn--review" disabled={busy} onClick={() => actions.onReview(req.request_id)}>
-            {busy ? "Reviewing…" : req.review_id ? "Re-review" : "Review"}
+            {busy ? (actions.activeReview === req.request_id ? "Reviewing…" : "Queued…") : req.review_id ? "Re-review" : "Review"}
           </button>
-          {req.status === "reviewed" ? (
+          {req.status === "reviewed" && !busy ? (
             <div className="decide">
               <button className="btn btn--ghost" onClick={() => actions.onDecide(req, "granted")}>
                 Grant

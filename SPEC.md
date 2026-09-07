@@ -352,12 +352,17 @@ shows a banner with a Retry button.
 The requests whose status is `new`, `reviewed`, or `returned`, sorted by
 `received_at` descending. Columns: requester with request id, ticket, and
 notes; role with system, sensitivity pill, and the justification clamped to
-two lines; window with the day count; recommendation pill with the duration
-note; issues; actions.
+two lines; access period with the day count; recommendation with its issues
+or review summary and flagged checks; actions. Returned requests show the
+return note. Earlier review details stay hidden on unreviewed, returned,
+and pending requests. The header explains the agent and the owner's role.
+A short guide explains Limit and Escalate.
 
 Actions per row: **Review** (or Re-review), and on a `reviewed` row
-**Grant**, **Return**, **Deny**. Each opens the confirm modal. **Review all**
+**Grant**, **Return**, **Deny**. Decisions open the confirm modal. **Review all**
 in the header reviews every `new` row. Reviews queue and run one at a time.
+The header counts active and queued reviews separately. Pending rows show
+Reviewing or Queued, and hide decision buttons until the review finishes.
 
 ### System owner: Request detail
 
