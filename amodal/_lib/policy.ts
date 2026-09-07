@@ -32,7 +32,13 @@ export interface AccessMath {
 
 const DAY = 86_400_000;
 
-export const daysBetween = (start: string, end: string) => Math.round((Date.parse(end) - Date.parse(start)) / DAY);
+export const isIsoDate = (value: string) => {
+  const time = Date.parse(value);
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(time) && new Date(time).toISOString().slice(0, 10) === value;
+};
+
+export const daysBetween = (start: string, end: string) =>
+  isIsoDate(start) && isIsoDate(end) ? Math.round((Date.parse(end) - Date.parse(start)) / DAY) : NaN;
 
 export const maxDays = (sensitivity: Sensitivity) =>
   sensitivity === "privileged" ? POLICY.privileged_max_days : POLICY.standard_max_days;

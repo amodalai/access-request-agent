@@ -59,6 +59,23 @@ test("allows a clean grant and blocks one over the limit for its sensitivity", a
   assert.equal((await hook.run("preToolUse", write("store__requests__set", { ...tom, role_id: "aws.prod_admin", end_date: "2026-10-01", status: "granted" }), c)).action, "allow");
 });
 
+test("blocks grants with invalid, reversed, or empty access periods", async () => {
+  for (const [start_date, end_date] of [
+    ["2026-02-30", "2026-03-20"], ["invalid", "2026-09-10"],
+    ["2026-09-10", "2026-09-01"], ["2026-09-01", "2026-09-01"],
+  ]) {
+    const request = { ...tom, start_date, end_date };
+    for (const [name, value] of [
+      ["store__requests__set", { ...request, status: "granted" }],
+      ["store__reviews__set", { review_id: "rev_invalid", request_id: tom.request_id, recommendation: "grant" }],
+    ]) {
+      const decision = await hook.run("preToolUse", write(name, value), ctx({ requests: [request] }));
+      assert.equal(decision.action, "block", `${name}: ${start_date} to ${end_date}`);
+      assert.match(decision.reason, /invalid access period/);
+    }
+  }
+});
+
 test("blocks a segregation-of-duties conflict on the request, the review, and the entitlement write", async () => {
   const c = ctx({ entitlements: [clerk], requests: [priya] });
   const d = await hook.run("preToolUse", write("store__requests__set", { ...priya, status: "granted" }), c);

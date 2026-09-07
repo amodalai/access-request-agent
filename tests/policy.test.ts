@@ -33,3 +33,11 @@ test("an end date on or before the start is invalid, and an unknown sensitivity 
   assert.equal(accessMath({ start_date: "nope", end_date: "2026-09-01", sensitivity: "standard" }).requested_days, 0);
   assert.equal(accessMath({ start_date: "2026-09-01", end_date: "2026-10-01", sensitivity: "weird" as "standard" }).max_days, 365);
 });
+
+test("invalid calendar dates cannot become a valid access period", () => {
+  for (const start_date of ["2026-02-30", "2026-13-01", "09/01/2026"]) {
+    const math = accessMath({ start_date, end_date: "2026-12-01", sensitivity: "standard" });
+    assert.equal(math.valid_dates, false, start_date);
+    assert.equal(math.within_limit, false, start_date);
+  }
+});

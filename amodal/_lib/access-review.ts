@@ -130,7 +130,7 @@ export function grantBlockers(f: Facts, request: Pick<RequestRow, "role_id" | "s
   if (f.conflicts_with.length > 0)
     out.push(`conflicts with ${f.conflicts_with.join(" and ")}, which the requester already holds (segregation of duties)`);
   if (f.already_held) out.push(`the requester already holds ${label}`);
-  if (!f.math.valid_dates) out.push("the end date is not after the start date");
+  if (!f.math.valid_dates) out.push("the dates are invalid or the end date is not after the start date");
   else if (!f.math.within_limit)
     out.push(`${f.math.requested_days} days requested, over the ${f.math.max_days}-day limit for ${f.sensitivity} roles`);
   return out;

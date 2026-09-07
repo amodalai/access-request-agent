@@ -87,8 +87,11 @@ export function createHook(config) {
 
       if (toolName !== "store__entitlements__set") {
         const days = daysBetween(String(subject.start_date), String(subject.end_date));
+        if (!Number.isFinite(days) || days <= 0) {
+          return block(ctx, toolName, id, "invalid access period; use calendar dates with the end after the start");
+        }
         const max = privileged.has(role) ? privilegedMax : standardMax;
-        if (Number.isFinite(days) && days > max) {
+        if (days > max) {
           return block(ctx, toolName, id, `${days} days is over the ${max}-day limit for ${privileged.has(role) ? "privileged" : "standard"} roles`);
         }
       }
@@ -106,4 +109,9 @@ function block(ctx, toolName, id, why) {
 }
 
 const num = (v, fallback) => (typeof v === "number" && Number.isFinite(v) ? v : fallback);
-const daysBetween = (start, end) => Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000);
+const isIsoDate = (value) => {
+  const time = Date.parse(value);
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(time) && new Date(time).toISOString().slice(0, 10) === value;
+};
+const daysBetween = (start, end) =>
+  isIsoDate(start) && isIsoDate(end) ? Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000) : NaN;

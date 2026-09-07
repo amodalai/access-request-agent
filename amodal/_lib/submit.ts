@@ -1,6 +1,7 @@
 import { PEOPLE, roleOf, slug } from "./catalog.js";
 import { NEW_REQUEST_DEFAULTS } from "./demo-data.js";
 import { appendEvent } from "./events.js";
+import { isIsoDate } from "./policy.js";
 import { rows, runRequestReview, storeGetResult, type EntitlementRow, type RequestRow, type ReviewDeps } from "./access-review.js";
 
 export interface SubmitParams {
@@ -16,10 +17,6 @@ export interface SubmitParams {
 }
 
 const text = (v: unknown) => (typeof v === "string" ? v.trim() : "");
-const isoDate = (s: string) => {
-  const t = Date.parse(s);
-  return /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(t) && new Date(t).toISOString().slice(0, 10) === s;
-};
 
 /**
  * Check a submission and throw one error naming every problem. The duration
@@ -35,7 +32,7 @@ export function validateSubmission(input: unknown): SubmitParams {
   };
   const date = (field: string) => {
     const v = required(field);
-    if (v && !isoDate(v)) problems.push(`${field} must be a date as YYYY-MM-DD`);
+    if (v && !isIsoDate(v)) problems.push(`${field} must be a date as YYYY-MM-DD`);
     return v;
   };
   const role_id = required("role_id");
@@ -44,7 +41,7 @@ export function validateSubmission(input: unknown): SubmitParams {
   if (requester && !PEOPLE[requester]) problems.push(`requester ${requester} is not a known employee`);
   const start_date = date("start_date");
   const end_date = date("end_date");
-  if (start_date && end_date && isoDate(start_date) && isoDate(end_date) && end_date <= start_date) {
+  if (start_date && end_date && isIsoDate(start_date) && isIsoDate(end_date) && end_date <= start_date) {
     problems.push("end_date must be after start_date");
   }
   const justification = required("justification");
