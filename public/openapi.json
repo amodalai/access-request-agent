@@ -1,0 +1,336 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Access Requests Demo API",
+    "version": "0.1.0",
+    "description": "Access requests and entitlements from the fictional access demo. These operations read saved records and never grant or provision access."
+  },
+  "servers": [
+    {"url": "/"}
+  ],
+  "security": [
+    {"runtimeBearer": []}
+  ],
+  "paths": {
+    "/api/stores/requests": {
+      "get": {
+        "operationId": "list_requests",
+        "tags": [
+          "Access requests"
+        ],
+        "summary": "List access requests",
+        "description": "Read saved records in the demo's unscoped store. The record is in each document's payload. An empty page means there are no matching saved records; it does not seed the demo.",
+        "parameters": [
+          {"$ref": "#/components/parameters/Limit"},
+          {"$ref": "#/components/parameters/Offset"},
+          {"$ref": "#/components/parameters/Filter"},
+          {"$ref": "#/components/parameters/Sort"}
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of saved demo records.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/AccessRequestPage"}
+              }
+            }
+          },
+          "400": {"description": "The filter is not valid JSON."},
+          "401": {"description": "Missing or invalid runtime credentials."},
+          "403": {"description": "The credential does not permit access to this agent."},
+          "404": {"description": "The store or record does not exist."},
+          "500": {"description": "The runtime could not read the store."}
+        }
+      }
+    },
+    "/api/stores/requests/{key}": {
+      "get": {
+        "operationId": "get_request",
+        "tags": [
+          "Access requests"
+        ],
+        "summary": "Get one access request",
+        "description": "Read a saved record by its request_id. History is empty when the store has no version history configured.",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "description": "The record's request_id.",
+            "schema": {"type": "string", "minLength": 1}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The saved record and any retained versions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "document",
+                    "history"
+                  ],
+                  "properties": {
+                    "document": {"$ref": "#/components/schemas/AccessRequestDocument"},
+                    "history": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/AccessRequestDocument"}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"description": "Missing or invalid runtime credentials."},
+          "403": {"description": "The credential does not permit access to this agent."},
+          "404": {"description": "The store or record does not exist."},
+          "500": {"description": "The runtime could not read the store."}
+        }
+      }
+    },
+    "/api/stores/entitlements": {
+      "get": {
+        "operationId": "list_entitlements",
+        "tags": [
+          "Entitlements"
+        ],
+        "summary": "List entitlements",
+        "description": "Read saved records in the demo's unscoped store. The record is in each document's payload. An empty page means there are no matching saved records; it does not seed the demo.",
+        "parameters": [
+          {"$ref": "#/components/parameters/Limit"},
+          {"$ref": "#/components/parameters/Offset"},
+          {"$ref": "#/components/parameters/Filter"},
+          {"$ref": "#/components/parameters/Sort"}
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of saved demo records.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/EntitlementPage"}
+              }
+            }
+          },
+          "400": {"description": "The filter is not valid JSON."},
+          "401": {"description": "Missing or invalid runtime credentials."},
+          "403": {"description": "The credential does not permit access to this agent."},
+          "404": {"description": "The store or record does not exist."},
+          "500": {"description": "The runtime could not read the store."}
+        }
+      }
+    },
+    "/api/stores/entitlements/{key}": {
+      "get": {
+        "operationId": "get_entitlement",
+        "tags": [
+          "Entitlements"
+        ],
+        "summary": "Get one entitlement",
+        "description": "Read a saved record by its entitlement_id. History is empty when the store has no version history configured.",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "description": "The record's entitlement_id.",
+            "schema": {"type": "string", "minLength": 1}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The saved record and any retained versions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "document",
+                    "history"
+                  ],
+                  "properties": {
+                    "document": {"$ref": "#/components/schemas/EntitlementDocument"},
+                    "history": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/EntitlementDocument"}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"description": "Missing or invalid runtime credentials."},
+          "403": {"description": "The credential does not permit access to this agent."},
+          "404": {"description": "The store or record does not exist."},
+          "500": {"description": "The runtime could not read the store."}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "runtimeBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "An ak_ API key for this deployed agent or a short-lived runtime token. Same-origin signed-in browsers use their session cookie."
+      }
+    },
+    "parameters": {
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Maximum records to return. Zero returns only the count.",
+        "schema": {"type": "integer", "minimum": 0, "default": 20}
+      },
+      "Offset": {
+        "name": "offset",
+        "in": "query",
+        "description": "Records to skip. Increase by the page size while hasMore is true.",
+        "schema": {"type": "integer", "minimum": 0, "maximum": 10000, "default": 0}
+      },
+      "Filter": {
+        "name": "filter",
+        "in": "query",
+        "description": "JSON object of exact payload field matches, for example {\"status\":\"reviewed\"}. URL-encode the value.",
+        "schema": {"type": "string"}
+      },
+      "Sort": {
+        "name": "sort",
+        "in": "query",
+        "description": "Payload field to sort by; prefix with - for descending order. Defaults to most recently saved first. Values sort as text.",
+        "schema": {"type": "string"}
+      }
+    },
+    "schemas": {
+      "StoreDocument": {
+        "type": "object",
+        "required": [
+          "key",
+          "appId",
+          "store",
+          "version",
+          "payload",
+          "meta"
+        ],
+        "properties": {
+          "key": {"type": "string"},
+          "appId": {"type": "string"},
+          "store": {"type": "string"},
+          "version": {"type": "integer"},
+          "payload": {"type": "object", "description": "The saved demo record."},
+          "meta": {
+            "type": "object",
+            "properties": {
+              "computedAt": {"type": "string", "format": "date-time"},
+              "stale": {"type": "boolean"}
+            }
+          }
+        }
+      },
+      "AccessRequest": {
+        "type": "object",
+        "required": [
+          "request_id"
+        ],
+        "properties": {
+          "request_id": {"type": "string"},
+          "requester": {"type": "string"},
+          "manager": {"type": "string"},
+          "role_id": {"type": "string"},
+          "system": {"type": "string"},
+          "role": {"type": "string"},
+          "sensitivity": {"type": "string", "enum": ["standard", "privileged"]},
+          "justification": {"type": "string"},
+          "ticket": {"type": "string", "nullable": true},
+          "start_date": {"type": "string"},
+          "end_date": {"type": "string"},
+          "notes": {"type": "string", "nullable": true},
+          "revision": {"type": "number"},
+          "status": {"type": "string", "enum": ["new", "reviewed", "granted", "denied", "returned"]},
+          "recommendation": {"type": "string", "enum": ["grant", "limit", "escalate", "deny", null], "nullable": true},
+          "review_id": {"type": "string", "nullable": true},
+          "reviewed_at": {"type": "string", "format": "date-time", "nullable": true},
+          "decided_at": {"type": "string", "format": "date-time", "nullable": true},
+          "decision_note": {"type": "string", "nullable": true},
+          "returned_note": {"type": "string", "nullable": true},
+          "received_at": {"type": "string", "format": "date-time"},
+          "submitted_at": {"type": "string", "format": "date-time"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "AccessRequestDocument": {
+        "allOf": [
+          {"$ref": "#/components/schemas/StoreDocument"},
+          {
+            "type": "object",
+            "properties": {
+              "payload": {"$ref": "#/components/schemas/AccessRequest"}
+            }
+          }
+        ]
+      },
+      "AccessRequestPage": {
+        "type": "object",
+        "required": [
+          "documents",
+          "total",
+          "hasMore"
+        ],
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/AccessRequestDocument"}
+          },
+          "total": {"type": "integer", "minimum": 0},
+          "hasMore": {"type": "boolean"}
+        }
+      },
+      "Entitlement": {
+        "type": "object",
+        "required": [
+          "entitlement_id"
+        ],
+        "properties": {
+          "entitlement_id": {"type": "string"},
+          "person": {"type": "string"},
+          "role_id": {"type": "string"},
+          "system": {"type": "string"},
+          "role": {"type": "string"},
+          "sensitivity": {"type": "string", "enum": ["standard", "privileged"]},
+          "granted_at": {"type": "string", "format": "date-time"},
+          "expires_at": {"type": "string", "format": "date-time"},
+          "source_request_id": {"type": "string", "nullable": true},
+          "status": {"type": "string", "enum": ["active", "expired"]},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "EntitlementDocument": {
+        "allOf": [
+          {"$ref": "#/components/schemas/StoreDocument"},
+          {
+            "type": "object",
+            "properties": {
+              "payload": {"$ref": "#/components/schemas/Entitlement"}
+            }
+          }
+        ]
+      },
+      "EntitlementPage": {
+        "type": "object",
+        "required": [
+          "documents",
+          "total",
+          "hasMore"
+        ],
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/EntitlementDocument"}
+          },
+          "total": {"type": "integer", "minimum": 0},
+          "hasMore": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}
