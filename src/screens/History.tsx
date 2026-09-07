@@ -31,14 +31,17 @@ export function History({ data }: { data: Data }) {
     <section>
       <div className="screen__bar">
         <div>
-          <h2>History</h2>
-          <p className="sub">Every action on every request, newest first, from the events store.</p>
+          <h1>History</h1>
+          <p className="sub">Every action on every request, newest first, with who did what and why.</p>
         </div>
-        <input className="filter" placeholder="Person, role, or request id" value={text} onChange={(e) => setText(e.target.value)} />
+        <label className="search-label">
+          Search history
+          <input className="filter" placeholder="Person, role, or request id" value={text} onChange={(e) => setText(e.target.value)} />
+        </label>
       </div>
       <div className="chips">
         {CHIPS.map((c, i) => (
-          <button key={c.label} className={`chip${chip === i ? " active" : ""}`} onClick={() => setChip(i)}>
+          <button key={c.label} className={`chip${chip === i ? " active" : ""}`} aria-pressed={chip === i} onClick={() => setChip(i)}>
             {c.label}
           </button>
         ))}
@@ -46,45 +49,47 @@ export function History({ data }: { data: Data }) {
       {events.length === 0 ? (
         <div className="empty">No events match.</div>
       ) : (
-        <table className="grid">
-          <thead>
-            <tr>
-              <th>When</th>
-              <th>Actor</th>
-              <th>Event</th>
-              <th>Request</th>
-              <th>Recommendation or note</th>
-            </tr>
-          </thead>
-          <tbody>
-            {events.map((e) => {
-              const req = e.request_id ? byId.get(e.request_id) : undefined;
-              return (
-                <tr key={e.event_id}>
-                  <td className="nowrap">{when(e.created_at)}</td>
-                  <td>{e.actor}</td>
-                  <td>
-                    {KIND_LABEL[e.kind]}
-                    {e.revision && e.revision > 1 ? <span className="muted-text"> rev {e.revision}</span> : null}
-                  </td>
-                  <td>
-                    {e.request_id ? (
-                      <a href={hashOf({ name: "request", id: e.request_id })}>
-                        {req ? `${roleLabel(req)} for ${req.requester}` : e.request_id}
-                      </a>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td>
-                    {e.recommendation ? <span className={`pill rec-${e.recommendation}`}>{REC_LABEL[e.recommendation]}</span> : null}
-                    {e.note ? <div className="note">{e.note}</div> : null}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="table-scroll" role="region" aria-label="Request history" tabIndex={0}>
+          <table className="grid">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Actor</th>
+                <th>Event</th>
+                <th>Request</th>
+                <th>Recommendation or note</th>
+              </tr>
+            </thead>
+            <tbody>
+              {events.map((e) => {
+                const req = e.request_id ? byId.get(e.request_id) : undefined;
+                return (
+                  <tr key={e.event_id}>
+                    <td className="nowrap">{when(e.created_at)}</td>
+                    <td>{e.actor}</td>
+                    <td>
+                      {KIND_LABEL[e.kind]}
+                      {e.revision && e.revision > 1 ? <span className="muted-text"> rev {e.revision}</span> : null}
+                    </td>
+                    <td>
+                      {e.request_id ? (
+                        <a href={hashOf({ name: "request", id: e.request_id })}>
+                          {req ? `${roleLabel(req)} for ${req.requester}` : e.request_id}
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
+                      {e.recommendation ? <span className={`pill rec-${e.recommendation}`}>{REC_LABEL[e.recommendation]}</span> : null}
+                      {e.note ? <div className="note">{e.note}</div> : null}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   );

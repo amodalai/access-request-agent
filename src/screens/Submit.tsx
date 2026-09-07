@@ -68,7 +68,7 @@ export function Submit({ data, initial }: { data: Data; initial?: RequestRow }) 
 
   if (saved) return (
     <section className="card">
-      <h3>Request submitted</h3>
+      {initial ? <h3>Request submitted</h3> : <h1>Request submitted</h1>}
       <p role="status">
         {saved.review_error
           ? "Your request is saved, but its review could not finish. The system owner can retry it from the queue."
@@ -86,8 +86,8 @@ export function Submit({ data, initial }: { data: Data; initial?: RequestRow }) 
   );
 
   return (
-    <form className="card form" onSubmit={(e) => void onSubmit(e)}>
-      <h3>{initial ? `Edit and resubmit ${initial.request_id}` : "Request access"}</h3>
+    <form className="card form" aria-busy={busy} onSubmit={(e) => void onSubmit(e)}>
+      {initial ? <h3>Edit and resubmit your request</h3> : <h1>Request access</h1>}
       <p className="sub">
         Requesting as <strong>{REQUESTER}</strong>, manager {PEOPLE[REQUESTER].manager}.
         {held.length ? ` Roles held: ${held.map(roleLabel).join(", ")}.` : " No roles held."}
@@ -95,7 +95,7 @@ export function Submit({ data, initial }: { data: Data; initial?: RequestRow }) 
       <div className="form__row">
         <label>
           Role
-          <select value={roleId} onChange={(e) => setRoleId(e.target.value)}>
+          <select disabled={busy} value={roleId} onChange={(e) => setRoleId(e.target.value)}>
             {SYSTEMS.map((system) => (
               <optgroup key={system} label={system}>
                 {ROLES.filter((r) => r.system === system).map((r) => (
@@ -118,16 +118,18 @@ export function Submit({ data, initial }: { data: Data; initial?: RequestRow }) 
       <div className="form__row">
         <label>
           Start date
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <input type="date" required disabled={busy} value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </label>
         <label>
           End date
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          <input type="date" required disabled={busy} min={startDate} value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </label>
       </div>
       <label>
         Justification
         <textarea
+          required
+          disabled={busy}
           value={justification}
           onChange={(e) => setJustification(e.target.value)}
           placeholder="What you need the role for, in your own words"
@@ -135,15 +137,15 @@ export function Submit({ data, initial }: { data: Data; initial?: RequestRow }) 
       </label>
       <div className="form__row">
         <label>
-          Ticket
-          <input value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Onboarding, incident, or change ticket, if any" />
+          Ticket (optional)
+          <input disabled={busy} value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Onboarding, incident, or change ticket, if any" />
         </label>
         <label>
-          Notes
-          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything the system owner should know" />
+          Notes (optional)
+          <input disabled={busy} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything the system owner should know" />
         </label>
       </div>
-      {error ? <div className="banner error">{error}</div> : null}
+      {error ? <div className="banner error" role="alert">{error}</div> : null}
       <div className="modal__actions">
         <button className="btn" type="submit" disabled={busy}>
           {busy ? "Submitting and reviewing…" : initial ? "Resubmit" : "Submit for review"}

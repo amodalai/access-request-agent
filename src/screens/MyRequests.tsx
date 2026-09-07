@@ -9,7 +9,7 @@ export function MyRequests({ data }: { data: Data }) {
     <section>
       <div className="screen__bar">
         <div>
-          <h2>My requests</h2>
+          <h1>My requests</h1>
           <p className="sub">Everything {REQUESTER} has asked for, newest first. A returned request can be edited and resubmitted.</p>
         </div>
       </div>
@@ -19,49 +19,48 @@ export function MyRequests({ data }: { data: Data }) {
           <a href={hashOf({ name: "submit" })}>Request access</a>
         </div>
       ) : (
-        <table className="grid">
-          <thead>
-            <tr>
-              <th>Role</th>
-              <th>Window</th>
-              <th>Submitted</th>
-              <th>Status</th>
-              <th className="act"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {mine.map((req) => (
-              <tr key={req.request_id}>
-                <td>
-                  <a className="name" href={hashOf({ name: "request", id: req.request_id })}>
-                    {req.system} {req.role}
-                  </a>{" "}
-                  <SensitivityPill sensitivity={req.sensitivity} />
-                  <div className="id">
-                    {req.request_id}
-                    {req.revision > 1 ? ` · rev ${req.revision}` : ""}
-                  </div>
-                </td>
-                <td className="nowrap">
-                  {req.start_date} <span className="muted-text">to</span> {req.end_date}
-                  <div className="note">{windowDays(req)} days</div>
-                </td>
-                <td className="nowrap">{when(req.submitted_at)}</td>
-                <td>
-                  <StatusPill req={req} requester />
-                  {req.status === "returned" && req.returned_note ? <div className="note">{req.returned_note}</div> : null}
-                </td>
-                <td className="act">
-                  {req.status === "returned" ? (
-                    <a className="btn" href={hashOf({ name: "request", id: req.request_id })}>
-                      Edit and resubmit
-                    </a>
-                  ) : null}
-                </td>
+        <div className="table-scroll" role="region" aria-label="My requests" tabIndex={0}>
+          <table className="grid">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Access period</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th className="act">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {mine.map((req) => (
+                <tr key={req.request_id}>
+                  <td>
+                    <a className="name" href={hashOf({ name: "request", id: req.request_id })}>
+                      {req.system} {req.role}
+                    </a>{" "}
+                    <SensitivityPill sensitivity={req.sensitivity} />
+                    {req.revision > 1 ? <div className="note">Revision {req.revision}</div> : null}
+                  </td>
+                  <td className="nowrap">
+                    {req.start_date} <span className="muted-text">to</span> {req.end_date}
+                    <div className="note">{windowDays(req)} days</div>
+                  </td>
+                  <td className="nowrap">{when(req.submitted_at)}</td>
+                  <td>
+                    <StatusPill req={req} requester />
+                    {req.status === "returned" && req.returned_note ? <div className="note">{req.returned_note}</div> : null}
+                  </td>
+                  <td className="act">
+                    {req.status === "returned" ? (
+                      <a className="btn" href={hashOf({ name: "request", id: req.request_id })}>
+                        Edit and resubmit
+                      </a>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   );

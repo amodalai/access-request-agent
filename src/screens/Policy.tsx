@@ -11,8 +11,8 @@ export function Policy() {
     <section>
       <div className="screen__bar">
         <div>
-          <h2>Policy</h2>
-          <p className="sub">The limits and pairs the code enforces, then the policy text the reviewer subagent reads.</p>
+          <h1>Policy</h1>
+          <p className="sub">The access limits and the policy the agent uses to review each request.</p>
         </div>
       </div>
       <section className="card">
@@ -28,9 +28,8 @@ export function Policy() {
         </dl>
       </section>
       <p className="sub">
-        The <code>access-guard</code> hook enforces the hard rules for every writer, the chat agent included. The values
-        live in <code>amodal/_lib/catalog.ts</code>, <code>amodal/_lib/policy.ts</code>, <code>hooks/access-guard/hook.json</code>, and{" "}
-        <code>amodal/knowledge/access-policy.md</code>: change one, change all of them, then redeploy.
+        Requests that conflict with existing access or exceed the duration limit cannot be granted.
+        Privileged roles need security sign-off.
       </p>
       <section className="card">
         <FormattedMarkdown className="policy__body">{accessPolicy}</FormattedMarkdown>

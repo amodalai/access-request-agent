@@ -6,7 +6,7 @@ test("the queue shows the request, recommendation, failed checks, and issues", (
   const ui = mount();
   reviewed(ui);
   const row = text(ui.rows()[0]);
-  for (const value of ["Priya Nair", "AP Approver", "Deny", "segregation failed", "AP Clerk conflicts with AP Approver."]) {
+  for (const value of ["Priya Nair", "AP Approver", "Deny", "Existing access: blocked", "AP Clerk conflicts with AP Approver."]) {
     assert.ok(row.includes(value), value);
   }
   assert.ok(ui.render().some((el) => el.type === "a" && el.props.href === "#/request/req_priya_netsuite_ap_approver"));

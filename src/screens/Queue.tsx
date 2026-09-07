@@ -15,19 +15,24 @@ export function Queue({ data }: { data: Data }) {
     <section>
       <div className="screen__bar">
         <div>
-          <h2>
+          <h1>
             Access requests
             {requests.length ? <span className="screen__count">{requests.length}</span> : null}
-          </h2>
+          </h1>
           <p className="sub">
-            Employees asking for access to business systems. The agent checks their existing access, the requested dates,
-            and the reason against the access policy. You review its recommendation and decide whether to grant, return, or deny.
+            The agent checks each request against existing access and company policy, then explains its recommendation.
+            You decide whether to grant, return, or deny.
           </p>
         </div>
         <button className="btn" disabled={pending.length === 0} onClick={() => pending.forEach((r) => actions.onReview(r.request_id))}>
           {reviewLabel ?? (pending.length > 1 ? `Review all ${pending.length}` : "Review")}
         </button>
       </div>
+      <ol className="demo-steps" aria-label="Demo steps">
+        <li>Review the six example requests</li>
+        <li>Compare the reasons</li>
+        <li>Make a decision</li>
+      </ol>
       <p className="sub queue-guide">
         Limit means a shorter period or narrower role is needed. Escalate means security sign-off is needed.
         Open a request to see the full review.

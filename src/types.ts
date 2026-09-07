@@ -75,6 +75,13 @@ export const REC_LABEL: Record<Recommendation, string> = {
   deny: "Deny",
 };
 
+export const CHECK_LABEL: Record<string, string> = {
+  role: "Role",
+  segregation: "Existing access",
+  duration: "Access period",
+  justification: "Reason",
+};
+
 /** What a requester sees in place of the recommendation. */
 export const STATUS_LABEL: Record<RequestRow["status"], string> = {
   new: "Under review",

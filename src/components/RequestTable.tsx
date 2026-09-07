@@ -1,6 +1,6 @@
 import type { RequestActions } from "../actions.js";
 import { hashOf } from "../routes.js";
-import { latestReview, windowDays, type Data, type RequestRow } from "../types.js";
+import { CHECK_LABEL, latestReview, windowDays, type Data, type RequestRow } from "../types.js";
 import { RequestActionButtons } from "./RequestActions.js";
 import { SensitivityPill, StatusPill } from "./StatusPill.js";
 
@@ -14,11 +14,9 @@ function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: Req
         <a className="name" href={hashOf({ name: "request", id: req.request_id })}>
           {req.requester}
         </a>
-        <div className="id">
-          {req.request_id}
-          {req.revision > 1 ? ` · rev ${req.revision}` : ""}
-          {req.ticket ? ` · ${req.ticket}` : ""}
-        </div>
+        {req.ticket || req.revision > 1 ? (
+          <div className="note">{[req.ticket, req.revision > 1 ? `Revision ${req.revision}` : null].filter(Boolean).join(" · ")}</div>
+        ) : null}
         {req.notes ? <div className="note">{req.notes}</div> : null}
       </td>
       <td className="role">
@@ -55,7 +53,7 @@ function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: Req
           <div className="checks">
             {flagged.map((c) => (
               <span key={c.name} className={`pill check-${c.status}`} title={c.note}>
-                {c.name} {c.status === "fail" ? "failed" : "flagged"}
+                {CHECK_LABEL[c.name] ?? c.name}: {c.status === "fail" ? "blocked" : "needs review"}
               </span>
             ))}
           </div>
@@ -72,21 +70,23 @@ function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: Req
 
 export function RequestTable({ requests, data, actions }: { requests: RequestRow[]; data: Data; actions: RequestActions }) {
   return (
-    <table className="grid">
-      <thead>
-        <tr>
-          <th>Requester</th>
-          <th>Role</th>
-          <th>Access period</th>
-          <th>Recommendation</th>
-          <th className="act"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {requests.map((req) => (
-          <Row key={req.request_id} req={req} data={data} actions={actions} />
-        ))}
-      </tbody>
-    </table>
+    <div className="table-scroll" role="region" aria-label="Access requests" tabIndex={0}>
+      <table className="grid">
+        <thead>
+          <tr>
+            <th>Requester</th>
+            <th>Role</th>
+            <th>Access period</th>
+            <th>Recommendation</th>
+            <th className="act">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((req) => (
+            <Row key={req.request_id} req={req} data={data} actions={actions} />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

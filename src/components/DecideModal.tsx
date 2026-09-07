@@ -48,7 +48,7 @@ export function DecideModal({
       <dl className="modal__fields">
         <dt>Role</dt>
         <dd>{roleLabel(req)}</dd>
-        <dt>Window</dt>
+        <dt>Access period</dt>
         <dd>
           {req.start_date} to {req.end_date}, {windowDays(req)} days
         </dd>

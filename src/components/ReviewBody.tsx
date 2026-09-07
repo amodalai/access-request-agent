@@ -1,4 +1,4 @@
-import type { ReviewRow } from "../types.js";
+import { CHECK_LABEL, type ReviewRow } from "../types.js";
 
 /** A review's summary, four checks, and issues. */
 export function ReviewBody({ review }: { review: ReviewRow }) {
@@ -6,19 +6,21 @@ export function ReviewBody({ review }: { review: ReviewRow }) {
     <div className="review">
       <p>{review.summary}</p>
       {review.checks?.length ? (
-        <table className="grid grid--compact">
-          <tbody>
-            {review.checks.map((c) => (
-              <tr key={c.name}>
-                <td className="check-name">{c.name}</td>
-                <td>
-                  <span className={`pill check-${c.status}`}>{c.status}</span>
-                </td>
-                <td>{c.note}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="table-scroll" role="region" aria-label="Review checks" tabIndex={0}>
+          <table className="grid grid--compact">
+            <tbody>
+              {review.checks.map((c) => (
+                <tr key={c.name}>
+                  <td className="check-name">{CHECK_LABEL[c.name] ?? c.name}</td>
+                  <td>
+                    <span className={`pill check-${c.status}`}>{c.status}</span>
+                  </td>
+                  <td>{c.note}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : null}
       {review.issues.length ? (
         <ul className="issue-list">

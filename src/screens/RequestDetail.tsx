@@ -21,7 +21,7 @@ export function RequestSection({ req, data }: { req: RequestRow; data: Data }) {
           {roleLabel(req)} <SensitivityPill sensitivity={req.sensitivity} />
           {role ? <div className="note">{role.purpose}</div> : null}
         </dd>
-        <dt>Window</dt>
+        <dt>Access period</dt>
         <dd>
           {req.start_date} to {req.end_date}, {windowDays(req)} days
         </dd>
@@ -114,9 +114,9 @@ export function RequestDetail({ id, data, requester }: { id: string; data: Data;
     <section>
       <div className="screen__bar">
         <div>
-          <h2>
+          <h1>
             {roleLabel(req)} for {req.requester}
-          </h2>
+          </h1>
           <p className="sub">
             {windowDays(req)} days · revision {req.revision} · {req.request_id}
           </p>

@@ -126,6 +126,10 @@ export default function App() {
 
   return (
     <div className="app">
+      <a className="skip-link" href="#main-content" onClick={(e) => {
+        e.preventDefault();
+        document.getElementById("main-content")?.focus();
+      }}>Skip to content</a>
       <Sidebar
         persona={persona}
         route={route}
@@ -136,7 +140,7 @@ export default function App() {
           setConfirmReset(true);
         }}
       />
-      <main className="page">
+      <main className="page" id="main-content" tabIndex={-1}>
         {loadError ? (
           <div className="banner error" role="alert">
             The demo data could not be loaded. Try again.{" "}
@@ -161,8 +165,7 @@ export default function App() {
         )}
 
         <footer className="foot">
-          Fictional demo. People, systems, roles, and the access policy are made up. The agent assists; a human decides.
-          Nothing is provisioned anywhere.
+          Built with Amodal. Fictional people, systems, and policy. You make the decisions; no real access is provisioned.
         </footer>
       </main>
 
@@ -185,7 +188,7 @@ export default function App() {
         user={{ id: persona.role }}
         getToken={async () => ""}
         agent="default"
-        theme={{ primaryColor: "#0f766e", mode: "light" }}
+        theme={{ primaryColor: "#08534d", mode: "light" }}
         onStreamEnd={() => {
           void data.refetch();
         }}
