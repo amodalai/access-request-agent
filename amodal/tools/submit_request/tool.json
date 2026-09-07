@@ -1,5 +1,5 @@
 {
-  "description": "Submit an access request for review, as an employee. Validates the fields, writes the request row (a new one, or the returned one at revision + 1 when request_id is given), appends the submitted or resubmitted event, then reviews the request in the same run: the deterministic checks in code, the policy judgment in the access-reviewer subagent. Returns { request_id, revision, recommendation, review_id }. Fired only from the requester's New request form via the direct-invoke lane; not listed in any agent's tools.",
+  "description": "Submit an access request for review, as an employee. Validates the fields, writes the request row (a new one, or the returned one at revision + 1 when request_id is given), appends the submitted or resubmitted event, then reviews the request in the same run: the deterministic checks in code, the policy judgment in the access-reviewer subagent. Returns { request_id, revision, recommendation, review_id }, or { request_id, revision, review_error } when the request is saved but its review fails. Retry the saved request instead of submitting a duplicate. Fired only from the requester's New request form via the direct-invoke lane; not listed in any agent's tools.",
   "parameters": {
     "type": "object",
     "additionalProperties": false,

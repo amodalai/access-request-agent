@@ -55,8 +55,9 @@ demo" button.
   executes the handler with the same composite context, which is what the
   `review <id>` and `seed` commands use. A run's result is
   `{ sessionId, outcome, result }`; a thrown handler error resolves with
-  `outcome.kind: "failed"` and the message in `outcome.reason`, so the UI
-  reads the outcome instead of catching.
+  `outcome.kind: "failed"` and the message in `outcome.reason`. Only
+  `outcome.kind: "complete"` is success. `runTool` converts every other
+  outcome into an error the screen displays.
 - **Store tools** are `store__<name>__get`, `__set`, `__query`, `__list`, and
   `__remove`. `__remove` is registered only for a store whose JSON declares
   `"deletable": true`; all four stores do. Reset uses `__list` and `__remove`.
@@ -121,9 +122,12 @@ Rules the tools enforce:
 - `returned` requires a note.
 - Granting a request whose latest recommendation is `escalate` requires a
   note.
-- The hard rules (`grantBlockers`) block a grant in `decide_request` and in
-  the `access-guard` hook.
-- Only a `returned` request can be resubmitted.
+- The complete hard rules (`grantBlockers`) block a grant in `decide_request`.
+  The hook backstops role conflicts on grants and entitlements, and valid
+  request durations on request and review writes. It checks visible records;
+  referenced rows that a run has not committed are evaluated in the handler.
+- Only a `returned` request can be resubmitted. Only `new` and `reviewed`
+  requests can be reviewed.
 
 ## Policy
 
@@ -139,7 +143,7 @@ The rules the code enforces, in `policy.ts`, `catalog.ts`, and the hook:
 Hard rules (never grantable as asked): a segregation-of-duties conflict with
 an active entitlement, a role already held, a duplicate of an open request
 by the same person for the same role, a window over the limit, an end date
-not after the start date, a role the catalog does not have.
+not after the start date, an invalid calendar date, a role the catalog does not have.
 
 Floor: conflict, held, duplicate, or unknown role is never better than
 `deny`; a privileged role never better than `escalate`; a window over the
@@ -250,15 +254,19 @@ Behavior:
 5. Append `submitted` or `resubmitted`, actor the requester.
 6. Run the review on the in-memory row, with the requester's entitlements
    and other requests read from the stores.
-7. Return `{ request_id, revision, recommendation, review_id }`. A failing
-   review leaves the request `new` and rethrows.
+7. Return `{ request_id, revision, recommendation, review_id }`. If the review
+   fails after the request is saved, return `{ request_id, revision, review_error }`
+   and retain the request for a review retry. The UI shows its saved id and
+   suppresses a second submission. A refresh failure offers a refresh retry.
 
 ### `review_request`
 
 `runRequestReview` takes an optional preloaded `{ request, held, others }`.
 Without one it loads from the stores, which is the path the chat trigger and
-the evals take, including the self-seeding fallback on fresh stores. On
-completion it writes the review row, re-emits the request with
+the evals take, including the self-seeding fallback on fresh stores. Only
+`new` and `reviewed` requests can be reviewed; human decisions and returned
+requests cannot be reopened by this tool. Structured check notes, statuses,
+issues, and the summary are validated before writing. On completion it writes the review row, re-emits the request with
 `status: reviewed`, `review_id`, `recommendation`, `reviewed_at`, and appends
 a `reviewed` event with actor `agent`.
 
@@ -339,30 +347,35 @@ idempotent per row, and returns how many requests it wrote.
 
 ## Seeding on first open
 
-In `App.tsx`, once the `requests` query has loaded and returned no rows, the
+In `App.tsx`, the initial read of all four stores completes before a screen
+opens or seeding starts. If those reads succeed and requests are empty, the
 app runs `seed_examples` through `useToolRun` and refetches. A ref prevents a
 second run under StrictMode; the tool is idempotent regardless. While it
 runs the page shows "Loading the demo…" in place of the tables. A failure
-shows a banner with a Retry button.
+shows a banner with a Retry button. Read failures also expose a retry.
+Cached background refreshes retain the active screen and its review queue.
 
 ## Screens
 
 ### System owner: Queue
 
 The requests whose status is `new`, `reviewed`, or `returned`, sorted by
-`received_at` descending. Columns: requester with request id, ticket, and
-notes; role with system, sensitivity pill, and the justification clamped to
-two lines; access period with the day count; recommendation with its issues
-or review summary and flagged checks; actions. Returned requests show the
+`received_at` descending. Four columns: requester with ticket and revision;
+role with system, sensitivity, justification, dates, and day count;
+recommendation with its issues or review summary and flagged checks; actions.
+Full request ids and notes are available on the detail page. Returned requests show the
 return note. Earlier review details stay hidden on unreviewed, returned,
 and pending requests. The header explains the agent and the owner's role.
-A short guide explains Limit and Escalate.
+A three-step introduction describes reviewing, comparing reasons, and
+deciding. A short guide explains Limit and Escalate. Named keyboard-accessible
+scroll regions contain tables on narrow screens; forms and headers reflow.
 
-Actions per row: **Review** (or Re-review), and on a `reviewed` row
+Actions on a `new` or `reviewed` row: **Review** (or Re-review), and on a `reviewed` row
 **Grant**, **Return**, **Deny**. Decisions open the confirm modal. **Review all**
 in the header reviews every `new` row. Reviews queue and run one at a time.
 The header counts active and queued reviews separately. Pending rows show
 Reviewing or Queued, and hide decision buttons until the review finishes.
+Returned rows show that the requester must edit and resubmit.
 
 ### System owner: Request detail
 
@@ -380,7 +393,7 @@ Header: role, requester, day count, revision, status pill. Sections:
 ### System owner: Systems
 
 One row per catalog role: system and role with the sensitivity pill and the
-id, purpose, the roles it conflicts with, the active holders with their
+purpose, the roles it conflicts with, the active holders with their
 expiry, and the open requests for it (linked).
 
 ### System owner: History
@@ -404,6 +417,8 @@ roles currently held.
 
 Submit runs `submit_request`, holds the button at "Submitting and
 reviewing…" while the review runs, then navigates to the request detail.
+A saved request with a failed review or refresh shows its saved-state panel
+and request link; retrying refresh cannot submit the form again.
 
 ### Requester: My requests
 
@@ -419,6 +434,10 @@ review's issues, and the form prefilled for resubmission. On `granted` or
 `denied`: the note. No checks, no recommendation, no timeline.
 
 ### Modals
+
+Confirmations use a named native dialog, contain keyboard focus, and restore
+focus when closed. Escape, Cancel, and backdrop dismissal are disabled while
+saving. Required decision notes have a visible label.
 
 - **Decide**: one modal for the three decisions, with the note required for
   `returned` and for granting an `escalate`. The copy says what the decision
@@ -513,6 +532,13 @@ Evals, `amodal eval`:
 Verification before each commit: `npm run typecheck`, `npm test`, and
 `amodal eval` for any change under `agents/`, `amodal/tools/`, or
 `amodal/knowledge/`.
+
+## Read-only API
+
+`public/openapi.json` is served at `/openapi.json` and describes list and
+get operations for the requests and entitlements runtime stores. Authentication,
+response envelopes, and connection setup are documented in [docs/api.md](docs/api.md).
+The contract adds no write operations or separate server.
 
 ## Out of scope
 
