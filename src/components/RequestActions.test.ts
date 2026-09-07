@@ -21,7 +21,7 @@ test("a re-review hides decisions and the earlier verdict until it finishes", as
   await setImmediate();
   assert.deepEqual(buttons().map(text), ["Reviewing…"]);
   assert.ok(!text(ui.rows()[0]).includes(review.issues[0]));
-  ui.finish[0]({ outcome: { kind: "completed" } });
+  ui.finish[0]({ outcome: { kind: "complete" } });
   await setImmediate();
   assert.deepEqual(buttons().map(text), ["Re-review", "Grant", "Return", "Deny"]);
 });
