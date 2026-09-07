@@ -88,7 +88,11 @@ export default function App() {
     }
   }
 
-  const empty = !requestsQ.isLoading && !requestsQ.error && data.requests.length === 0;
+  const queries = [requestsQ, entitlementsQ, reviewsQ, eventsQ];
+  const loading = queries.some((query) => query.isLoading && !query.data);
+  const loadError = queries.find((query) => query.error)?.error;
+  const unavailable = queries.some((query) => !query.data && query.error);
+  const empty = !loading && !loadError && data.requests.length === 0;
   useEffect(() => {
     if (!empty || seededRef.current) return;
     seededRef.current = true;
@@ -133,8 +137,14 @@ export default function App() {
         }}
       />
       <main className="page">
+        {loadError ? (
+          <div className="banner error" role="alert">
+            The demo data could not be loaded. Try again.{" "}
+            <button className="btn btn--ghost" onClick={() => void data.refetch()}>Retry</button>
+          </div>
+        ) : null}
         {seedError ? (
-          <div className="banner error">
+          <div className="banner error" role="alert">
             {seedError}{" "}
             <button className="btn btn--ghost" onClick={() => void runSeed()}>
               Retry
@@ -142,10 +152,10 @@ export default function App() {
           </div>
         ) : null}
 
-        {requestsQ.isLoading ? (
-          <div className="empty">Loading…</div>
-        ) : seed.status === "running" ? (
-          <div className="empty">Loading the demo…</div>
+        {loading ? (
+          <div className="empty" role="status">Loading the demo…</div>
+        ) : unavailable ? null : seed.status === "running" ? (
+          <div className="empty" role="status">Loading the demo…</div>
         ) : (
           <Screen route={route} data={data} persona={persona} />
         )}
