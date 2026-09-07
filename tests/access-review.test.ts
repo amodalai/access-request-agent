@@ -98,6 +98,20 @@ test("parses the reviewer's JSON even when wrapped in fences or prose", () => {
   assert.throws(() => parseReviewResult('{"summary":"x"}'), /missing a string/);
 });
 
+test("rejects malformed reviewer checks and issues before storing a review", async () => {
+  for (const malformed of [
+    { checks: [null] },
+    { checks: [{ name: "duration", status: "pass", note: { text: "ok" } }] },
+    { checks: [{ name: "duration", status: "unknown", note: "ok" }] },
+    { issues: [{ text: "Too broad" }] },
+    { summary: null },
+  ]) {
+    const { deps, calls } = fakeDeps(JSON.stringify({ ...JSON.parse(REPLY), ...malformed }), NOW);
+    await assert.rejects(runRequestReview("req_tom_github_developer", deps), /invalid (checks|issues|summary)/);
+    assert.ok(!calls.some(([name]) => name.endsWith("__set")));
+  }
+});
+
 test("storeGetResult treats the runtime's error envelope as missing", () => {
   assert.equal(storeGetResult({ error: "not found" }), undefined);
   assert.equal(storeGetResult(null), undefined);

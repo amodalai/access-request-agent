@@ -191,11 +191,23 @@ export function parseReviewResult(text: string): ReviewResult {
   if (typeof r.recommendation !== "string") {
     throw new Error(`${REVIEWER_SUBAGENT} JSON is missing a string \`recommendation\``);
   }
+  if (typeof r.summary !== "string" || !r.summary.trim()) {
+    throw new Error(`${REVIEWER_SUBAGENT} returned invalid summary; review the request again.`);
+  }
+  if (!Array.isArray(r.checks) || r.checks.some((c) =>
+    !c || typeof c.name !== "string" || !c.name.trim() ||
+    !["pass", "flag", "fail"].includes(c.status) || typeof c.note !== "string",
+  )) {
+    throw new Error(`${REVIEWER_SUBAGENT} returned invalid checks; review the request again.`);
+  }
+  if (!Array.isArray(r.issues) || r.issues.some((issue) => typeof issue !== "string")) {
+    throw new Error(`${REVIEWER_SUBAGENT} returned invalid issues; review the request again.`);
+  }
   return {
     recommendation: r.recommendation,
-    summary: typeof r.summary === "string" ? r.summary : "",
-    checks: Array.isArray(r.checks) ? r.checks : [],
-    issues: Array.isArray(r.issues) ? r.issues : [],
+    summary: r.summary,
+    checks: r.checks,
+    issues: r.issues,
   };
 }
 
