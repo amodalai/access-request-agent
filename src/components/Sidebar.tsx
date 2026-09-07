@@ -80,7 +80,7 @@ export function Sidebar({
       </nav>
       <div className="rail__foot">
         <label className="persona">
-          <span>Acting as</span>
+          <span>Demo role</span>
           <select value={persona.role} onChange={(e) => onSwitch(e.target.value)}>
             <option value="approver">System owner</option>
             <option value="requester">{REQUESTER}</option>

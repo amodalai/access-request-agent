@@ -9,6 +9,10 @@ test("the queue shows the request, recommendation, failed checks, and issues", (
   for (const value of ["Priya Nair", "AP Approver", "Deny", "Existing access: blocked", "AP Clerk conflicts with AP Approver."]) {
     assert.ok(row.includes(value), value);
   }
+  const req = ui.data.requests[1];
+  for (const value of [req.start_date, req.end_date, "days", req.ticket]) {
+    if (value) assert.ok(row.includes(value), value);
+  }
   assert.ok(ui.render().some((el) => el.type === "a" && el.props.href === "#/request/req_priya_netsuite_ap_approver"));
 });
 
@@ -30,6 +34,6 @@ test("returned and unreviewed requests do not show an earlier review as current"
   assert.ok(!text(ui.rows()[0]).includes(review.issues[0]));
   req.status = "new";
   req.recommendation = null;
-  assert.match(text(ui.rows()[0]), /Choose Review/);
+  assert.match(text(ui.rows()[0]), /Not reviewed/);
   assert.ok(!text(ui.rows()[0]).includes(review.issues[0]));
 });

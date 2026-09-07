@@ -536,7 +536,7 @@ code {
 
 /* The role cell: system and role on top, sensitivity, the justification clamped to two lines. */
 .role {
-  min-width: 20ch;
+  min-width: 18ch;
 }
 
 .role__name {
@@ -565,7 +565,7 @@ code {
 }
 
 .verdict {
-  min-width: 26ch;
+  min-width: 20ch;
   max-width: 46ch;
 }
 
@@ -747,7 +747,8 @@ a.btn {
 /* The action cell: a fixed-width review slot, then the segmented decision group. */
 .act-row {
   display: inline-flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   justify-content: flex-end;
   gap: 10px;
 }
@@ -769,7 +770,8 @@ a.btn {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  padding: 0 13px;
+  min-width: 56px;
+  padding: 0 8px;
 }
 
 .decide .btn + .btn {
@@ -1276,6 +1278,25 @@ a.btn {
   max-width: 100%;
   overflow-x: auto;
   border-radius: var(--radius);
+}
+
+.request-grid th,
+.request-grid td {
+  padding: 12px;
+}
+
+.request-grid th:first-child,
+.request-grid td:first-child {
+  padding-left: 14px;
+}
+
+.request-grid th:last-child,
+.request-grid td:last-child {
+  padding-right: 14px;
+}
+
+.access-period {
+  max-width: 26ch;
 }
 
 .demo-steps {

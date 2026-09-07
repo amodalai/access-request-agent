@@ -17,7 +17,6 @@ function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: Req
         {req.ticket || req.revision > 1 ? (
           <div className="note">{[req.ticket, req.revision > 1 ? `Revision ${req.revision}` : null].filter(Boolean).join(" · ")}</div>
         ) : null}
-        {req.notes ? <div className="note">{req.notes}</div> : null}
       </td>
       <td className="role">
         <div className="role__name">
@@ -27,12 +26,9 @@ function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: Req
         <div className="note role__why" title={req.justification}>
           {req.justification}
         </div>
-      </td>
-      <td>
-        <div>
-          {req.start_date} <span className="muted-text">to</span> {req.end_date}
+        <div className="note access-period">
+          <strong>{windowDays(req)} days</strong> · {req.start_date} to {req.end_date}
         </div>
-        <div className="note">{windowDays(req)} days</div>
       </td>
       <td className="verdict">
         {busy ? (
@@ -48,7 +44,6 @@ function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: Req
           </ul>
         ) : review?.summary ? <div className="reason">{review.summary}</div> : null}
         {req.status === "returned" && !busy && req.returned_note ? <div className="reason">{req.returned_note}</div> : null}
-        {req.status === "new" && !busy ? <div className="note">Choose Review to check this request.</div> : null}
         {flagged.length ? (
           <div className="checks">
             {flagged.map((c) => (
@@ -71,12 +66,11 @@ function Row({ req, data, actions }: { req: RequestRow; data: Data; actions: Req
 export function RequestTable({ requests, data, actions }: { requests: RequestRow[]; data: Data; actions: RequestActions }) {
   return (
     <div className="table-scroll" role="region" aria-label="Access requests" tabIndex={0}>
-      <table className="grid">
+      <table className="grid request-grid">
         <thead>
           <tr>
             <th>Requester</th>
             <th>Role</th>
-            <th>Access period</th>
             <th>Recommendation</th>
             <th className="act">Actions</th>
           </tr>
