@@ -107,10 +107,11 @@ npm run typecheck
 npm run build
 ```
 
-Vite serves the UI and proxies runtime requests to `VITE_RUNTIME_URL`, which
-defaults to `http://localhost:3001`. A running Amodal runtime is required for
-the stores, tools, and chat. The production build includes the UI and
-`openapi.json` in `dist/`. No lint script is configured.
+Vite serves the UI. Development runtime requests go to `VITE_RUNTIME_URL`,
+which defaults to `http://localhost:3001`. Production builds use the page's
+absolute origin for runtime requests and hosted authentication. A running
+Amodal runtime is required for the stores, tools, and chat. The production
+build includes the UI and `openapi.json` in `dist/`. No lint script is configured.
 
 `npm test` covers the deterministic checks, review and decision lifecycle,
 submission recovery, seed and reset behavior, guard hook, routes, UI state,
