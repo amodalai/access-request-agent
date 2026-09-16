@@ -102,7 +102,6 @@ Cloud's `/openapi.json` path against the same records the UI displays.
 ```sh
 npm install
 npm run dev
-npm test
 npm run typecheck
 npm run build
 ```
@@ -113,9 +112,7 @@ absolute origin for runtime requests and hosted authentication. A running
 Amodal runtime is required for the stores, tools, and chat. The production
 build includes the UI and `openapi.json` in `dist/`. No lint script is configured.
 
-`npm test` covers the deterministic checks, review and decision lifecycle,
-submission recovery, seed and reset behavior, guard hook, routes, UI state,
-confirmation dialogs, and API contract. The ten [evals](evals) test model
+The ten [evals](evals) test model
 recommendations, history answers, and the boundary between chat and human
 decisions. Run them from the agent's **Evals** page on a fresh demo dataset.
 An operator's decisions can change the facts the cases depend on.
